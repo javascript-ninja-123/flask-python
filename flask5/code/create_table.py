@@ -2,6 +2,7 @@ import sqlite3
 
 databse = "data.db"
 
+
 def connect(database_url):
     connection = None
     try:

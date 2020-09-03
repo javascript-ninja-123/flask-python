@@ -3,19 +3,18 @@ from models.store import StoreModel
 
 
 class Store(Resource):
-    parser  = reqparse.RequestParser()
-    parser.add_argument("name", type=str, required=True, help="this field cannot be blank")
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "name", type=str, required=True, help="this field cannot be blank"
+    )
 
-
-
-    def get(self,name):
+    def get(self, name: str):
         store = StoreModel.find_by_name(name)
         if store is None:
             return {"message": "does not exist"}, 400
         return store.json(), 200
 
-
-    def post(self, name):
+    def post(self, name: str):
         if StoreModel.find_by_name(name):
             return {"message": "already exists"}, 400
         data = Store.parser.parse_args()
@@ -26,24 +25,17 @@ class Store(Resource):
         except:
             return {"message": "failed"}, 500
 
-
-    
-    def delete(self, name):
+    def delete(self, name: str):
         store = StoreModel.find_by_name(name)
         if store is None:
             return {"message": "does not exist"}, 400
         try:
             store.delete_from_db()
-            return {"message":"deleted"}, 200
+            return {"message": "deleted"}, 200
         except:
-            return {"message":"cannot delete"}, 500
-        
+            return {"message": "cannot delete"}, 500
 
 
 class StoreList(Resource):
     def get(self):
-        return {"stores": [store.json() for store in StoreModel.query.all()]},200
-
-    
-
-
+        return {"stores": [store.json() for store in StoreModel.query.all()]}, 200
