@@ -2,16 +2,13 @@ from typing import Dict, List, Union
 from flask_restful import Resource, reqparse
 from flask import request,url_for
 from db import db
-from requests import Response, post
+from libs.mailgun import Mailgun
+from requests import Response
 
 
 USER_JSON = Dict[str, Union[str, int]]
 
-MAILGUN_DOMAIN = 'sandbox8a5e88cc26e34d18b5ac0cdf9afae14a.mailgun.org'
 
-MAILGUN_API_KEY = '002dfc4761f6147c4d326924f1f3c324-7cd1ac2b-e26c7f87'
-
-FROM_EMAIL = 'postmaster@sandbox8a5e88cc26e34d18b5ac0cdf9afae14a.mailgun.org'
 
 
 class UserModel(db.Model):
@@ -31,14 +28,10 @@ class UserModel(db.Model):
         
         
     def send_confirmation_email(self) -> Response:
+        
         link = request.url_root[0:-1] + url_for("userconfirm", user_id=self.id)
-        return post(
-		f"https://api.mailgun.net/v3/{MAILGUN_DOMAIN}/messages",
-		auth=("api", MAILGUN_API_KEY),
-		data={"from": f"Excited User cool <{FROM_EMAIL}>",
-			"to": [self.email],
-			"subject": "Registration Confirmation",
-			"text": f"Please click the link to confirm your registration {link}"},)
+        return Mailgun.send_confirmation_email([self.email], "confirmation", f"click the link {link}")
+
       
         
 
